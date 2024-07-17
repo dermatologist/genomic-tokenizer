@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "genomic-tokenizer"
+version = "0.1.0"
+description = "Genomic Tokenizer"
+authors = ["Bell Eapen <github_public@gulfdoctor.net>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+transformers = "^4.42.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
