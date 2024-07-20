@@ -10,6 +10,27 @@ This is a tokenizer for genomic data. It is designed to Tokenize DNA sequences i
 pip install git+https://github.com/dermatologist/genomic-tokenizer.git
 ```
 
+## Example usage
+
+```python
+from genomic_tokenizer import GenomicTokenizer
+# Remove the fasta header if present
+fasta = """
+AGGCGTACCCGCCCCTGGGGACGTCATTGGTGGCGGAGGCAATGGCCGGCAACCAGCTGTAAGCGAGGTA
+GGCTCACTCGGGCGCGGAGGGTGCGGGTGAGAAAGGGAACGATTTGCTAGGAGTGTATGCGCCCGTGCTA
+GGGCTCCCAGGAATTCTTACAAGCGTAGACAGCCTAGCAATCAGCCCTGTGAAGTGGGGTTCAGGGCAGA
+"""
+model_max_length = 2048
+tokenizer = GenomicTokenizer(model_max_length)
+tokens = tokenizer(fasta)
+print(tokens)
+```
+
+### Output
+```
+{'input_ids': [2, 7, 12, 17, 19, 16, 1, 7, 20, 6, 12, 21, 16, 12, 20, 12, 12, 8, 12, 1, 10, 20, 10, 20, 11, 7, 20, 21, 23, 8, 7, 20, 7, 6, 12, 21, 19, 10, 11, 16, 19, 7, 1, 22, 7, 1, 19, 21, 7, 16, 1, 21, 12, 23, 19, 12, 20, 6, 1], 'token_type_ids': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}
+```
+
 ### Tokenization algorithm
 Identify the first occurence of the start codon `ATG`.
 Split the sequence into codons of length 3 starting from the start codon.
