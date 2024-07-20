@@ -13,6 +13,34 @@ from transformers.tokenization_utils import AddedToken, PreTrainedTokenizer
 
 
 class GenomicTokenizer(PreTrainedTokenizer):
+    # Define start codons and stop codons
+    start_codons = ["ATG"]
+    stop_codons = ["TAA", "TAG", "TGA"]
+    # Define codons for each amino acid
+    codons = {
+        7: ["GCT", "GCC", "GCA", "GCG"], # Alanine
+        8: ["TGT", "TGC"], # Cysteine
+        9: ["GAT", "GAC"], # Aspartic acid
+        10: ["GAA", "GAG"], # Glutamic acid
+        11: ["TTT", "TTC"], # Phenylalanine
+        12: ["GGT", "GGC", "GGA", "GGG"], # Glycine
+        13: ["CAT", "CAC"], # Histidine
+        14: ["ATT", "ATC", "ATA"], # Isoleucine
+        15: ["AAA", "AAG"], # Lysine
+        16: ["TTA", "TTG", "CTT", "CTC", "CTA", "CTG"], # Leucine
+        2: ["ATG"], # Methionine (Start)
+        17: ["AAT", "AAC"], # Asparagine
+        18: ["CCT", "CCC", "CCA", "CCG"], # Proline
+        19: ["CAA", "CAG"], # Glutamine
+        20: ["CGT", "CGC", "CGA", "CGG", "AGA", "AGG"], # Arginine
+        21: ["TCT", "TCC", "TCA", "TCG", "AGT", "AGC"], # Serine
+        22: ["ACT", "ACC", "ACA", "ACG"], # Threonine
+        23: ["GTT", "GTC", "GTA", "GTG"], # Valine
+        24: ["TGG"], # Tryptophan
+        25: ["TAT", "TAC"], # Tyrosine
+        1: ["TAA", "TAG", "TGA"], # Stop
+    }
+
     def __init__(self, characters: Sequence[str], model_max_length: int, padding_side: str='left', **kwargs):
         """Character tokenizer for Hugging Face transformers.
         Args:
@@ -43,7 +71,7 @@ class GenomicTokenizer(PreTrainedTokenizer):
 
         super().__init__(
             bos_token=bos_token,
-            eos_token=sep_token,
+            eos_token=eos_token,
             sep_token=sep_token,
             cls_token=cls_token,
             pad_token=pad_token,
