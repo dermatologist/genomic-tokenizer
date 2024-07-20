@@ -6,7 +6,7 @@ authors = ["Bell Eapen <github_public@gulfdoctor.net>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 transformers = "^4.42.4"
 
 

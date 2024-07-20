@@ -4,6 +4,12 @@
 
 This is a tokenizer for genomic data. It is designed to Tokenize DNA sequences in the FASTA format.
 
+## Installation
+
+```bash
+pip install git+https://github.com/dermatologist/genomic-tokenizer.git
+```
+
 ### Tokenization algorithm
 Identify the first occurence of the start codon `ATG`.
 Split the sequence into codons of length 3 starting from the start codon.
