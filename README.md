@@ -1,4 +1,4 @@
-# Genomic Tokenizer
+# :chains: Genomic Tokenizer
 
 ## About
 
@@ -40,16 +40,17 @@ print(tokenizer.decode(tokens["input_ids"]))
 ```
 
 ### Tokenization algorithm
-Identify the first occurence of the start codon `ATG`.
-Split the sequence into codons of length 3 starting from the start codon.
-Convert synonymous codons to the same token.
-Convert stop codons to [SEP] token.
+* Identify the first occurence of the start codon `ATG`.
+* Split the sequence into codons of length 3 starting from the start codon.
+* Convert synonymous codons to the same token.
+* Convert stop codons to [SEP] token.
 
 ## Inspired by
 
 * https://github.com/HazyResearch/hyena-dna/blob/main/src/dataloaders/datasets/hg38_char_tokenizer.py
 * https://github.com/dariush-bahrami/character-tokenizer/blob/master/charactertokenizer/core.py
 * And the CanineTokenizer in transformers package.
+* [Read this article ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11055402/) for details on more elaborate tokenization strategies.
 
 ## Cite as
 
