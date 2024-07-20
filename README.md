@@ -2,7 +2,7 @@
 
 ## About
 
-This is a tokenizer for genomic data. It is designed to Tokenize DNA sequences in the FASTA format. This is a hobby project that I completed in a couple of hours. It is neither tested nor used for model training. Feel free to use it and [improve it](/CONTRIBUTING.md). Please cite / [contact me](https://nuchange.ca/contact) if you use it in your research.
+This is a tokenizer for genomic data. It is designed to Tokenize DNA sequences in the FASTA format. This is a hobby project that I completed in a couple of hours. It is neither tested nor used for model training. Feel free to try it and [improve it](/CONTRIBUTING.md). Please cite / [contact me](https://nuchange.ca/contact) if you use it in your research.
 
 ## Installation
 
@@ -33,7 +33,7 @@ print(tokens)
 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}
 ```
 
-And like any other tokenizer in Hugging Face you can decode tokens as follow:
+And like any other tokenizer in [HuggingFace](https://huggingface.co/docs/tokenizers/en/index) you can decode tokens as follow:
 
 ```
 print(tokenizer.decode(tokens["input_ids"]))
