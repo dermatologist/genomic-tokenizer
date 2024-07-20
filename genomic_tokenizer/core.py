@@ -41,10 +41,10 @@ class GenomicTokenizer(PreTrainedTokenizer):
         1: ["TAA", "TAG", "TGA"], # Stop
     }
 
-    def __init__(self, characters: Sequence[str], model_max_length: int, padding_side: str='left', **kwargs):
+    def __init__(self, model_max_length: int, padding_side: str='left', **kwargs):
         """Character tokenizer for Hugging Face transformers.
         Args:
-            characters (Sequence[str]): List of desired characters. Any character which
+            ! characters (Sequence[str]): List of desired characters. Any character which
                 is not included in this list will be replaced by a special token called
                 [UNK] with id=6. Following are list of all of the special tokens with
                 their corresponding ids:
@@ -58,7 +58,6 @@ class GenomicTokenizer(PreTrainedTokenizer):
                 an id (starting at 7) will be assigned to each character.
             model_max_length (int): Model maximum sequence length.
         """
-        self.characters = characters
         self.model_max_length = model_max_length
         bos_token = AddedToken("[BOS]", lstrip=False, rstrip=False)
         eos_token = AddedToken("[SEP]", lstrip=False, rstrip=False)
@@ -91,7 +90,7 @@ class GenomicTokenizer(PreTrainedTokenizer):
             "[PAD]": 4,
             "[RESERVED]": 5,
             "[UNK]": 6,
-            **{ch: i + 7 for i, ch in enumerate(characters)},
+            **{self.codons.keys(): i + 7 for i in range(len(self.codons))},
         }
         self._vocab_int_to_str = {v: k for k, v in self._vocab_str_to_int.items()}
 
