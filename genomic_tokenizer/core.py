@@ -1,7 +1,7 @@
 """
 From: https://github.com/HazyResearch/hyena-dna/blob/main/src/dataloaders/datasets/hg38_char_tokenizer.py
 
-CharacterTokenzier for Hugging Face Transformers.
+CharacterTokenzier for HuggingFace Transformers.
 This is heavily inspired from CanineTokenizer in transformers package.
 """
 import json
@@ -43,11 +43,8 @@ class GenomicTokenizer(PreTrainedTokenizer):
 
     def __init__(self, model_max_length: int, padding_side: str='left', **kwargs):
         """Character tokenizer for Hugging Face transformers.
+        [UNK] token is used for anything that are not in the codons.
         Args:
-            ! characters (Sequence[str]): List of desired characters. Any character which
-                is not included in this list will be replaced by a special token called
-                [UNK] with id=6. Following are list of all of the special tokens with
-                their corresponding ids:
                     "[CLS]": 0
                     "[SEP]": 1
                     "[BOS]": 2
@@ -55,7 +52,7 @@ class GenomicTokenizer(PreTrainedTokenizer):
                     "[PAD]": 4
                     "[RESERVED]": 5
                     "[UNK]": 6
-                an id (starting at 7) will be assigned to each character.
+                an id (starting at 7) will be assigned to each codon.
             model_max_length (int): Model maximum sequence length.
         """
         self.model_max_length = model_max_length

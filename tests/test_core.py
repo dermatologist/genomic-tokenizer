@@ -23,3 +23,11 @@ def test_convert_tokens_to_ids():
     print(token_ids)
     assert len(token_ids) == len(tokens)
     assert all(isinstance(token_id, int) for token_id in token_ids)
+
+def test_convert_ids_to_tokens():
+    tokenizer = GenomicTokenizer(model_max_length=512)
+    token_ids = [1, 2, 3, 4]
+    tokens = tokenizer.convert_ids_to_tokens(token_ids)
+    print(tokens)
+    assert len(tokens) == len(token_ids)
+    assert all(isinstance(token, str) for token in tokens)
