@@ -70,7 +70,7 @@ class GenomicTokenizer(PreTrainedTokenizer):
 
         super().__init__(
             bos_token=bos_token,
-            eos_token=eos_token,
+            eos_token=sep_token,
             sep_token=sep_token,
             cls_token=cls_token,
             pad_token=pad_token,
@@ -90,7 +90,7 @@ class GenomicTokenizer(PreTrainedTokenizer):
             "[PAD]": 4,
             "[RESERVED]": 5,
             "[UNK]": 6,
-            **{self.codons.keys(): i + 7 for i in range(len(self.codons))},
+            **{ch: i + 7 for i, ch in enumerate(self.codons)},
         }
         self._vocab_int_to_str = {v: k for k, v in self._vocab_str_to_int.items()}
 
