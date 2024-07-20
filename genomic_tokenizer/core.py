@@ -14,7 +14,7 @@ from transformers.tokenization_utils import AddedToken, PreTrainedTokenizer
 
 class GenomicTokenizer(PreTrainedTokenizer):
     # Define start codons and stop codons
-    start_codons = ["ATG"]
+    start_codon = ["ATG"]
     stop_codons = ["TAA", "TAG", "TGA"]
     # Define codons for each amino acid
     codons = {
@@ -99,7 +99,20 @@ class GenomicTokenizer(PreTrainedTokenizer):
         return len(self._vocab_str_to_int)
 
     def _tokenize(self, text: str) -> List[str]:
-        return list(text)
+        # First convert the text to uppercase
+        # starting from the first occurrence of a self.start_codon in the text
+        # split the text into a list of 3 character long strings
+        text = text.upper()
+        start_codon = self.start_codon[0]
+        start_index = text.find(start_codon)
+        if start_index == -1:
+            return []
+        text = text[start_index:]
+        return [text[i : i + 3] for i in range(0, len(text), 3)]
+    
+
+
+
 
     def _convert_token_to_id(self, token: str) -> int:
         return self._vocab_str_to_int.get(token, self._vocab_str_to_int["[UNK]"])
