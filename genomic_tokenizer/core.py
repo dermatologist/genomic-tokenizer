@@ -99,10 +99,21 @@ class GenomicTokenizer(PreTrainedTokenizer):
         return len(self._vocab_str_to_int)
 
     def _tokenize(self, text: str) -> List[str]:
-        # First convert the text to uppercase
+        """Tokenizes a gene sequence in FASTA format.
+
+        Args:
+            text (str): The gene sequence in FASTA format.
+
+        Returns:
+            List[str]: A list of codons (tokens) starting from the first occurrence of a start codon in the text.
+        """
+        if text.startswith(">"):
+            text = text.split("\n", 1)[1]
+        # Convert the text to uppercase and remove newlines
+        text = text.upper().replace("\n", "")
         # starting from the first occurrence of a self.start_codon in the text
         # split the text into a list of 3 character long strings
-        text = text.upper()
+        # replace fasta header (line starting with >) if it exists
         start_codon = self.start_codon[0]
         start_index = text.find(start_codon)
         if start_index == -1:
