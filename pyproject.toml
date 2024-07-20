@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 transformers = "4.26.1"
+pytest = "^8.2.1"
 
 
 [build-system]
