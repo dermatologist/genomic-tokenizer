@@ -90,8 +90,11 @@ class GenomicTokenizer(PreTrainedTokenizer):
             "[PAD]": 4,
             "[RESERVED]": 5,
             "[UNK]": 6,
-            **{ch: i + 7 for i, ch in enumerate(self.codons)},
         }
+        for i in self.codons.keys():
+            for codon in self.codons[i]:
+                self._vocab_str_to_int[codon] = i
+
         self._vocab_int_to_str = {v: k for k, v in self._vocab_str_to_int.items()}
 
     @property
@@ -109,10 +112,6 @@ class GenomicTokenizer(PreTrainedTokenizer):
             return []
         text = text[start_index:]
         return [text[i : i + 3] for i in range(0, len(text), 3)]
-    
-
-
-
 
     def _convert_token_to_id(self, token: str) -> int:
         return self._vocab_str_to_int.get(token, self._vocab_str_to_int["[UNK]"])

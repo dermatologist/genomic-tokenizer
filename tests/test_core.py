@@ -5,7 +5,7 @@ def test_vocab_size():
 	tokenizer = GenomicTokenizer(model_max_length=512)
 	# expected_vocab_size = len(tokenizer.codons) + len(tokenizer._vocab_str_to_int) - len(tokenizer.codons) + 1  # Adjusting for the unique keys in codons and special tokens
 	# assert tokenizer.vocab_size == expected_vocab_size
-	assert tokenizer.vocab_size == 28
+	assert tokenizer.vocab_size == 71
 
 def test_tokenize_gene_fna():
 	with open("tests/gene.fna", "r") as file:
@@ -15,3 +15,11 @@ def test_tokenize_gene_fna():
 	print(tokenized_data)
 	assert len(tokenized_data) != 0
 	#Further assertions can be added based on expected tokenized data characteristics
+
+def test_convert_tokens_to_ids():
+    tokenizer = GenomicTokenizer(model_max_length=512)
+    tokens = ["GGA", "TGA", "GGG", "CAG"]
+    token_ids = tokenizer.convert_tokens_to_ids(tokens)
+    print(token_ids)
+    assert len(token_ids) == len(tokens)
+    assert all(isinstance(token_id, int) for token_id in token_ids)
