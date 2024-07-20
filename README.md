@@ -2,7 +2,7 @@
 
 ## About
 
-This is a tokenizer for genomic data. It is designed to Tokenize DNA sequences in the FASTA format.
+This is a tokenizer for genomic data. It is designed to Tokenize DNA sequences in the FASTA format. This is a hobby project that I completed in a couple of hours. It is neither tested nor used for model training. Feel free to use it and [improve it](/CONTRIBUTING.md). Please cite / [contact me](https://nuchange.ca/contact) if you use it in your research.
 
 ## Installation
 
@@ -14,7 +14,7 @@ pip install git+https://github.com/dermatologist/genomic-tokenizer.git
 
 ```python
 from genomic_tokenizer import GenomicTokenizer
-# Remove the fasta header if present
+# Fasta header if present is ignored.
 fasta = """
 AGGCGTACCCGCCCCTGGGGACGTCATTGGTGGCGGAGGCAATGGCCGGCAACCAGCTGTAAGCGAGGTA
 GGCTCACTCGGGCGCGGAGGGTGCGGGTGAGAAAGGGAACGATTTGCTAGGAGTGTATGCGCCCGTGCTA
