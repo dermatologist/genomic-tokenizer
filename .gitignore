@@ -1,3 +1,4 @@
+*.fna
 notebooks/fhirdata
 # Temporary and binary files
 *~
