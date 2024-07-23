@@ -1,0 +1,11 @@
+{
+    "tokenizer_class": "GenomicTokenizer",
+    "unk_token": "[UNK]",
+    "pad_token": "[PAD]",
+    "cls_token": "[CLS]",
+    "sep_token": "[SEP]",
+    "mask_token": "[MASK]",
+    "bos_token": "[BOS]",
+    "eos_token": "[SEP]",
+    "model_max_length": 1024
+}

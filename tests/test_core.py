@@ -36,3 +36,7 @@ def test_convert_ids_to_tokens():
     print(tokens)
     assert len(tokens) == len(token_ids)
     assert all(isinstance(token, str) for token in tokens)
+
+def test_save_pretrained():
+    tokenizer = GenomicTokenizer(model_max_length=512)
+    tokenizer.save_pretrained("tests/")
