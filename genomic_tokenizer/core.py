@@ -88,9 +88,11 @@ class GenomicTokenizer(PreTrainedTokenizer):
             "[RESERVED]": 5,
             "[UNK]": 6,
         }
+        self.characters = {}
         for i in self.codons.keys():
             for codon in self.codons[i]:
                 self._vocab_str_to_int[codon] = i
+                self.characters[codon] = i
 
         self._vocab_int_to_str = {v: k for k, v in self._vocab_str_to_int.items()}
 
@@ -170,7 +172,7 @@ class GenomicTokenizer(PreTrainedTokenizer):
         return result
 
     def get_config(self) -> Dict:
-        return {
+        _config = {
             "tokenizer_class": self.__class__.__name__,
             "unk_token": self.unk_token,
             "pad_token": self.pad_token,
@@ -179,8 +181,10 @@ class GenomicTokenizer(PreTrainedTokenizer):
             "mask_token": self.mask_token,
             "bos_token": self.bos_token,
             "eos_token": self.eos_token,
-            "model_max_length": 1024,
+            "model_max_length": self.model_max_length
         }
+        _config["codons"] = self.characters
+        return _config
 
     @classmethod
     def from_config(cls, config: Dict) -> "GenomicTokenizer":
