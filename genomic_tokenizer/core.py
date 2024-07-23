@@ -171,8 +171,15 @@ class GenomicTokenizer(PreTrainedTokenizer):
 
     def get_config(self) -> Dict:
         return {
-            "char_ords": [ord(ch) for ch in self.characters],
-            "model_max_length": self.model_max_length,
+            "tokenizer_class": self.__class__.__name__,
+            "unk_token": self.unk_token,
+            "pad_token": self.pad_token,
+            "cls_token": self.cls_token,
+            "sep_token": self.sep_token,
+            "mask_token": self.mask_token,
+            "bos_token": self.bos_token,
+            "eos_token": self.eos_token,
+            "model_max_length": 1024,
         }
 
     @classmethod
