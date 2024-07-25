@@ -164,9 +164,10 @@ class GenomicTokenizer(PreTrainedTokenizer):
         self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None
     ) -> List[int]:
         sep = [self.sep_token_id]
-        cls = [self.cls_token_id]
+        # cls = [self.cls_token_id]
 
-        result = len(cls + token_ids_0 + sep) * [0]
+        #! result = len(cls + token_ids_0 + sep) * [0]
+        result = len(token_ids_0 + sep) * [0]
         if token_ids_1 is not None:
             result += len(token_ids_1 + sep) * [1]
         return result
