@@ -1,8 +1,7 @@
 # :chains: Genomic Tokenizer
 
 ## About
-
-This is a tokenizer for genomic data (DNA sequences) in the FASTA format. This is a hobby project that I completed in a couple of hours. It is neither tested nor used for model training. Feel free to try it and [improve it](/CONTRIBUTING.md). Please cite / [contact me](https://nuchange.ca/contact) if you use it in your research.
+This is a tokenizer for DNA :chains: that aligns with the central dogma of molecular biology. You can use this tokenizer for training genomic transformer models. [See the BERT and GPT2 models trained on human genome](https://github.com/dermatologist/codon-llm). This is not tested yet, but feel free to try it and [improve it](/CONTRIBUTING.md). Please cite / [contact me](https://nuchange.ca/contact) if you use it in your research.
 
 ## 🚀 Installation
 
