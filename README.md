@@ -32,12 +32,6 @@ print(tokens)
 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}
 ```
 
-And like any other tokenizer in [HuggingFace](https://huggingface.co/docs/tokenizers/en/index) you can decode tokens as follow:
-
-```
-print(tokenizer.decode(tokens["input_ids"]))
-```
-
 ## 🔧 Tokenization algorithm
 * Identify the first occurence of the start codon `ATG`.
 * Split the sequence into codons of length 3 starting from the start codon.
