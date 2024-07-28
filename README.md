@@ -1,7 +1,7 @@
 # :chains: Genomic Tokenizer
 
 ## About
-This is a tokenizer for DNA :chains: that aligns with the central dogma of molecular biology. You can use this tokenizer for training genomic transformer models. [See the BERT and GPT2 models trained on human genome](https://github.com/dermatologist/codon-llm). This is not tested yet, but feel free to try it and [improve it](/CONTRIBUTING.md). Please cite / [contact me](https://nuchange.ca/contact) if you use it in your research.
+This is a tokenizer for DNA :chains: that aligns with the central dogma of molecular biology. You can use this tokenizer for training genomic transformer models. [See the BERT and GPT2 models trained on human genome](https://github.com/dermatologist/codon-llm). This is not tested yet, but feel free to try it and [improve it](/CONTRIBUTING.md). Please [cite](#books-cite) / [contact me](https://nuchange.ca/contact) if you use it in your research.
 
 ## 🚀 Installation
 
@@ -29,7 +29,7 @@ print(tokens)
 ```
 {'input_ids': [2, 7, 12, 17, 19, 16, 1, 7, 20, 6, 12, 21, 16, 12, 20, 12, 12, 8, 12, 1, 10, 20, 10, 20, 11, 7, 20, 21, 23, 8, 7, 20, 7, 6, 12, 21, 19, 10, 11, 16, 19, 7, 1, 22, 7, 1, 19, 21, 7, 16, 1, 21, 12, 23, 19, 12, 20, 6, 1],
 'token_type_ids': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}
+'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}
 ```
 
 ## 🔧 Tokenization algorithm
@@ -50,7 +50,7 @@ print(tokens)
 * Pre-train [DNAGPT](https://github.com/maris205/dnagpt) replacing BPE with this. (*No need to train_bpe.ipynb. Replace the `tokenizer` with this.*)
 * Replace the [default tokenizer](https://github.com/songlab-cal/gpn/blob/05b23c54c572813810c094b31031901f7109575b/gpn/data.py#L511) in [GPN (Genomic Pre-trained Network)](https://github.com/songlab-cal/gpn) with this.
 
-## :books: Cite as
+## :books: Cite
 
 ```
 @misc{genomic-tokenizer,
