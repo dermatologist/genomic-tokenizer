@@ -7,10 +7,9 @@ This is heavily inspired from CanineTokenizer in transformers package.
 import json
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Union
+from typing import Dict, List, Optional, Union
 
 from transformers.tokenization_utils import AddedToken, PreTrainedTokenizer
-
 
 class GenomicTokenizer(PreTrainedTokenizer):
     # Define start codons and stop codons
@@ -40,7 +39,79 @@ class GenomicTokenizer(PreTrainedTokenizer):
         25: ["TAT", "TAC"], # Tyrosine
         1: ["TAA", "TAG", "TGA"], # Stop
     }
-
+    _vocab_str_to_int = {
+            "[CLS]": 0,
+            "[SEP]": 1,
+            "[BOS]": 2,
+            "[MASK]": 3,
+            "[PAD]": 4,
+            "[RESERVED]": 5,
+            "[UNK]": 6,
+            "GCT": 7,
+            "GCC": 7,
+            "GCA": 7,
+            "GCG": 7,
+            "TGT": 8,
+            "TGC": 8,
+            "GAT": 9,
+            "GAC": 9,
+            "GAA": 10,
+            "GAG": 10,
+            "TTT": 11,
+            "TTC": 11,
+            "GGT": 12,
+            "GGC": 12,
+            "GGA": 12,
+            "GGG": 12,
+            "CAT": 13,
+            "CAC": 13,
+            "ATT": 14,
+            "ATC": 14,
+            "ATA": 14,
+            "AAA": 15,
+            "AAG": 15,
+            "TTA": 16,
+            "TTG": 16,
+            "CTT": 16,
+            "CTC": 16,
+            "CTA": 16,
+            "CTG": 16,
+            "ATG": 2,
+            "AAT": 17,
+            "AAC": 17,
+            "CCT": 18,
+            "CCC": 18,
+            "CCA": 18,
+            "CCG": 18,
+            "CAA": 19,
+            "CAG": 19,
+            "CGT": 20,
+            "CGC": 20,
+            "CGA": 20,
+            "CGG": 20,
+            "AGA": 20,
+            "AGG": 20,
+            "TCT": 21,
+            "TCC": 21,
+            "TCA": 21,
+            "TCG": 21,
+            "AGT": 21,
+            "AGC": 21,
+            "ACT": 22,
+            "ACC": 22,
+            "ACA": 22,
+            "ACG": 22,
+            "GTT": 23,
+            "GTC": 23,
+            "GTA": 23,
+            "GTG": 23,
+            "TGG": 24,
+            "TAT": 25,
+            "TAC": 25,
+            "TAA": 1,
+            "TAG": 1,
+            "TGA": 1
+    }
     def __init__(self, model_max_length: int, padding_side: str='left', **kwargs):
         """Character tokenizer for Hugging Face transformers.
         [UNK] token is used for anything that are not in the codons.
@@ -79,15 +150,6 @@ class GenomicTokenizer(PreTrainedTokenizer):
             **kwargs,
         )
 
-        self._vocab_str_to_int = {
-            "[CLS]": 0,
-            "[SEP]": 1,
-            "[BOS]": 2,
-            "[MASK]": 3,
-            "[PAD]": 4,
-            "[RESERVED]": 5,
-            "[UNK]": 6,
-        }
         self.characters = {}
         for i in self.codons.keys():
             for codon in self.codons[i]:
@@ -186,6 +248,18 @@ class GenomicTokenizer(PreTrainedTokenizer):
         }
         _config["codons"] = self.characters
         return _config
+
+    def get_vocab(self) -> Dict[str, int]:
+        """
+        Returns the vocabulary as a dictionary of token to index.
+
+        `tokenizer.get_vocab()[token]` is equivalent to `tokenizer.convert_tokens_to_ids(token)` when `token` is in the
+        vocab.
+
+        Returns:
+            `Dict[str, int]`: The vocabulary.
+        """
+        return self._vocab_str_to_int
 
     @classmethod
     def from_config(cls, config: Dict) -> "GenomicTokenizer":
