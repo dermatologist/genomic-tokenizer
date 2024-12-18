@@ -176,19 +176,34 @@ class GenomicTokenizer(PreTrainedTokenizer):
             text = text.split("\n", 1)[1]
         # Convert the text to uppercase and remove newlines
         text = text.upper().replace("\n", "")
+
+        start_index = self.find_any_substring(text, self.start_codon)
+        if start_index == -1:
+            # No start codon found, encode the entire sequence
+            pass
+        else:
+            # Start codon found, encode the sequence starting from the first start codon
+            text = text[start_index:]
+
         # Convert the text to a list of codons
         codons = [text[i : i + 3] for i in range(0, len(text), 3)]
         encoded = []
-        encode = False
+        encode = True
+
         for codon in codons:
-            if codon in self.start_codon:
-                encode = True
             if encode:
-                encoded.append(codon)
+                # If the codon is 3 characters long after removing spaces, add it
+                if len(codon.strip()) == 3:
+                    encoded.append(codon)
             else:
                 encoded.append(self.unk_token)
+            # If a stop codon is found, stop encoding
             if codon in self.stop_codons:
                 encode = False
+            # If a start codon is found, start encoding
+            if codon in self.start_codon:
+                encode = True
+                encoded.append(codon)
         return encoded
 
     def _convert_token_to_id(self, token: str) -> int:
@@ -199,6 +214,22 @@ class GenomicTokenizer(PreTrainedTokenizer):
 
     def convert_tokens_to_string(self, tokens):
         return "".join(tokens)
+
+    def find_any_substring(self, string, substring_list):
+        """Finds any substring from the list in the given string.
+
+        Args:
+            string: The string to search in.
+            substring_list: A list of substrings to search for.
+
+        Returns:
+            The first substring found, or None if no substring is found.
+        """
+
+        for substring in substring_list:
+            if string.find(substring) != -1:
+                return string.find(substring)
+        return -1
 
     def build_inputs_with_special_tokens(
         self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None
