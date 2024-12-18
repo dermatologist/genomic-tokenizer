@@ -171,19 +171,25 @@ class GenomicTokenizer(PreTrainedTokenizer):
         Returns:
             List[str]: A list of codons (tokens) starting from the first occurrence of a start codon in the text.
         """
+        # replace fasta header (line starting with >) if it exists
         if text.startswith(">"):
             text = text.split("\n", 1)[1]
         # Convert the text to uppercase and remove newlines
         text = text.upper().replace("\n", "")
-        # starting from the first occurrence of a self.start_codon in the text
-        # split the text into a list of 3 character long strings
-        # replace fasta header (line starting with >) if it exists
-        start_codon = self.start_codon[0]
-        start_index = text.find(start_codon)
-        if start_index == -1:
-            return []
-        text = text[start_index:]
-        return [text[i : i + 3] for i in range(0, len(text), 3)]
+        # Convert the text to a list of codons
+        codons = [text[i : i + 3] for i in range(0, len(text), 3)]
+        encoded = []
+        encode = False
+        for codon in codons:
+            if codon in self.start_codon:
+                encode = True
+            if encode:
+                encoded.append(codon)
+            else:
+                encoded.append(self.unk_token)
+            if codon in self.stop_codons:
+                encode = False
+        return encoded
 
     def _convert_token_to_id(self, token: str) -> int:
         return self._vocab_str_to_int.get(token, self._vocab_str_to_int["[UNK]"])
