@@ -112,7 +112,7 @@ class GenomicTokenizer(PreTrainedTokenizer):
             "TAG": 1,
             "TGA": 1
     }
-    def __init__(self, model_max_length: int, padding_side: str='left', **kwargs):
+    def __init__(self, model_max_length: int, padding_side: str='left', non_coding: bool=True, **kwargs):
         """Character tokenizer for Hugging Face transformers.
         [UNK] token is used for anything that are not in the codons.
         Args:
@@ -149,7 +149,8 @@ class GenomicTokenizer(PreTrainedTokenizer):
             padding_side=padding_side,
             **kwargs,
         )
-
+        self.non_coding = non_coding
+        self.paddding_side = padding_side
         self.characters = {}
         for i in self.codons.keys():
             for codon in self.codons[i]:
@@ -187,8 +188,11 @@ class GenomicTokenizer(PreTrainedTokenizer):
 
         # Convert the text to a list of codons
         codons = [text[i : i + 3] for i in range(0, len(text), 3)]
-        encoded = []
         encode = True
+        if self.paddding_side == 'left' and start_index > 3:
+            encoded = [self.pad_token] * int(start_index/3)
+        else:
+            encoded = []
 
         for codon in codons:
             if encode:
@@ -196,7 +200,8 @@ class GenomicTokenizer(PreTrainedTokenizer):
                 if len(codon.strip()) == 3:
                     encoded.append(codon)
             else:
-                encoded.append(self.unk_token)
+                # if non_coding is True, add a padding token for non-coding regions
+                encoded.append(self.pad_token)
             # If a stop codon is found, stop encoding
             if codon in self.stop_codons:
                 encode = False
@@ -204,6 +209,7 @@ class GenomicTokenizer(PreTrainedTokenizer):
             if codon in self.start_codon:
                 encode = True
                 encoded.append(codon)
+
         return encoded
 
     def _convert_token_to_id(self, token: str) -> int:
