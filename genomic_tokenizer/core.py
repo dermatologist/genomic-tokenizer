@@ -190,12 +190,16 @@ class GenomicTokenizer(PreTrainedTokenizer):
         encoded = []
         encode = True
 
+        #  Alrighty, So in short,
+        #  special tokens - attend & don’t compute loss
+        #  padding - don’t attend & don’t compute loss
         for codon in codons:
             if encode:
                 # If the codon is 3 characters long after removing spaces, add it
                 if len(codon.strip()) == 3:
                     encoded.append(codon)
             else:
+                # Attend & don’t compute loss for introns
                 encoded.append(self.unk_token)
             # If a stop codon is found, stop encoding
             if codon in self.stop_codons:
@@ -204,6 +208,10 @@ class GenomicTokenizer(PreTrainedTokenizer):
             if codon in self.start_codon:
                 encode = True
                 encoded.append(codon)
+        # Now strip any trailing unknown tokens,
+        # They will be padded
+        while encoded and encoded[-1] == self.unk_token:
+            encoded.pop()
         return encoded
 
     def _convert_token_to_id(self, token: str) -> int:

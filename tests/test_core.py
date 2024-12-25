@@ -7,6 +7,23 @@ def test_vocab_size():
 	# assert tokenizer.vocab_size == expected_vocab_size
 	assert tokenizer.vocab_size == 71
 
+def test_input_ids():
+    tokenizer = GenomicTokenizer(model_max_length=512)
+    # with open("tests/gene.fna", "r") as file:
+    # 	gene_data = file.read().replace("\n", "")
+    gene_data = """
+CAGTCTGAGCCTGGCCGTCGCCTCCAGCAAAGCTTGAGCTGCAGGAATGTCCCCGGCCTTGGCTCCCAGTG
+CCCTCCTTGGGGTCAAGGCCACCTCATCCTTGCCCCCAGGGGTGATACCTCGGGGGTTCTCCAGGCTGAGG
+CACCTGCAGGGCATAGGAAGGATGCAGGGCTTATGGTCTAGAGGAGGCAGAGGGAACTCTGGGCCCTGATG
+GTCTCCCCCTCCCTGCACACCCAGGGAGCAGAGGGAAGGTTCCTTGCAGGTGGGCAATGAGGCCCCTGTGA
+CCGGCTCCTCCCCGCTGGGCGCCACGCAGCTGGACACTGATGGAGCCCTGTGGCTTGGTGAGTGTTTTGGG
+GAGACTAGAGAGGGATGCCCAAGGGTCTCATGATATCCGAGGGACAGACTCCACCCCCCAGCGCCCACCCT
+TGAGTCAGGGTGCATGTGAGCCGGCGGGCTGGGCTCTCTTCTCCCGCTGTAGCCCCTGCAGTTCCCAGTGC
+TGTGGGGCCGGGAGG
+    """
+    output = tokenizer(gene_data, padding="max_length", max_length=512, truncation=True)
+    print(output)
+
 def test_tokenize_gene_fna():
 	# with open("tests/gene.fna", "r") as file:
 	# 	gene_data = file.read().replace("\n", "")
