@@ -336,3 +336,15 @@ class GenomicTokenizer(PreTrainedTokenizer):
         with open(cfg_file) as f:
             cfg = json.load(f)
         return cls.from_config(cfg)
+
+    def set_start_codon(self, start_codons: List[str]):
+        self.start_codon = start_codons
+        self.codons[2] = start_codons
+        for codon in start_codons:
+            self._vocab_str_to_int[codon] = 2
+
+    def set_stop_codons(self, stop_codons: List[str]):
+        self.stop_codons = stop_codons
+        self.codons[1] = stop_codons
+        for codon in stop_codons:
+            self._vocab_str_to_int[codon] = 1
