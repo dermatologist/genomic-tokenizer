@@ -23,6 +23,9 @@ TGTGGGGCCGGGAGG
     """
     output = tokenizer(gene_data, padding="max_length", max_length=512, truncation=True)
     print(output)
+    tokenizer = GenomicTokenizer(model_max_length=512, introns=False)
+    output = tokenizer(gene_data, padding="max_length", max_length=512, truncation=True)
+    print(output)
 
 def test_tokenize_gene_fna():
 	# with open("tests/gene.fna", "r") as file:

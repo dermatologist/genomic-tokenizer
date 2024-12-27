@@ -112,7 +112,11 @@ class GenomicTokenizer(PreTrainedTokenizer):
             "TAG": 1,
             "TGA": 1
     }
-    def __init__(self, model_max_length: int, padding_side: str='left', **kwargs):
+    def __init__(self,
+                 model_max_length: int,
+                 padding_side: str='left',
+                 introns: bool=True,  # Whether to include introns in the tokenized output
+                 **kwargs):
         """Character tokenizer for Hugging Face transformers.
         [UNK] token is used for anything that are not in the codons.
         Args:
@@ -127,6 +131,7 @@ class GenomicTokenizer(PreTrainedTokenizer):
             model_max_length (int): Model maximum sequence length.
         """
         self.model_max_length = model_max_length
+        self.introns = introns
         bos_token = AddedToken("[BOS]", lstrip=False, rstrip=False)
         eos_token = AddedToken("[SEP]", lstrip=False, rstrip=False)
         sep_token = AddedToken("[SEP]", lstrip=False, rstrip=False)
@@ -200,7 +205,8 @@ class GenomicTokenizer(PreTrainedTokenizer):
                     encoded.append(codon)
             else:
                 # Attend & don’t compute loss for introns
-                encoded.append(self.unk_token)
+                if self.introns:
+                    encoded.append(self.unk_token)
             # If a stop codon is found, stop encoding
             if codon in self.stop_codons:
                 encode = False
