@@ -37,3 +37,5 @@ jobs:
       # export POETRY_PYPI_TOKEN_PYPI=<token>
       - name: Publish the package
         run: poetry publish
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_API_TOKEN }}
