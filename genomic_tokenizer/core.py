@@ -1,8 +1,7 @@
 """
-From: https://github.com/HazyResearch/hyena-dna/blob/main/src/dataloaders/datasets/hg38_char_tokenizer.py
+Inspired by: https://github.com/HazyResearch/hyena-dna/blob/main/src/dataloaders/datasets/hg38_char_tokenizer.py
 and
 CharacterTokenzier: https://github.com/dariush-bahrami/character-tokenizer
-This is heavily inspired from CanineTokenizer in transformers package.
 """
 
 import json
