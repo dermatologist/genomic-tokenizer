@@ -6,6 +6,11 @@ This is a tokenizer for DNA :chains: that aligns with the central dogma of molec
 ## 🚀 Installation
 
 ```bash
+pip install genomic-tokenizer
+```
+
+### If you want to install the latest version from the repository, use the following command:
+```bash
 pip install git+https://github.com/dermatologist/genomic-tokenizer.git
 ```
 
