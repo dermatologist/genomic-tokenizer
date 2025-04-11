@@ -1,7 +1,9 @@
 # :chains: Genomic Tokenizer
 
 ## About
-This is a tokenizer for DNA :chains: that aligns with the central dogma of molecular biology. You can use this tokenizer for training genomic transformer models. Please [cite](#books-cite) / [contact me](https://nuchange.ca/contact) if you use it in your research.
+This is a tokenizer for DNA :chains: that aligns with the central dogma of molecular biology. The Genomic Tokenizer (GT) incorporates the biological process flow into a **standard tokenizer interface** within the HuggingFace transformer package. GT can be used to pre-train foundational transformer models on DNA sequences. [Read the preprint.](https://www.biorxiv.org/content/10.1101/2025.04.02.646836v1)
+
+Please [cite](#books-cite) / [contact me](https://nuchange.ca/contact) if you use it in your research.
 
 ## 🚀 Installation
 
