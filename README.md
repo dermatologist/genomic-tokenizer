@@ -53,16 +53,19 @@ print(tokens)
 ## :books: Cite
 
 ```
-@misc{genomic-tokenizer,
-  author = {Bell Raj Eapen},
-  title = {Genomic Tokenizer},
-  year = {2024},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{
-    https://github.com/dermatologist/genomic-tokenizer
-    }},
+
+@misc{GT-Eapen2025,
+  title = {Genomic {{Tokenizer}}: {{Toward}} a Biology-Driven Tokenization in Transformer Models for {{DNA}} Sequences},
+  shorttitle = {Genomic {{Tokenizer}}},
+  author = {Eapen, Bell Raj},
+  year = {2025},
+  month = apr,
+  pages = {2025.04.02.646836},
+  publisher = {bioRxiv},
+  doi = {10.1101/2025.04.02.646836},
+  urldate = {2025-04-11},
 }
+
 ```
 
 ## Give us a star ⭐️
