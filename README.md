@@ -1,5 +1,8 @@
 # :chains: Genomic Tokenizer
 
+[![PyPI download total](https://img.shields.io/pypi/dm/genomic-tokenizer.svg)](https://pypi.python.org/pypi/genomic-tokenizer/)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/dermatologist/genomic-tokenizer)
+
 ## About
 This is a tokenizer for DNA :chains: that aligns with the central dogma of molecular biology. The Genomic Tokenizer (GT) incorporates the biological process flow into a [**standard tokenizer interface** within the HuggingFace transformer package](https://huggingface.co/docs/transformers/en/main_classes/tokenizer). GT can be used to pre-train foundational transformer models on DNA sequences. [[Read the preprint](https://www.biorxiv.org/content/10.1101/2025.04.02.646836v1)]
 
