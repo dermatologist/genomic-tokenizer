@@ -16,7 +16,7 @@ jobs:
         fetch-depth: 0
     - uses: actions/setup-python@v5
       with:
-        python-version: 3.11
+        python-version: '3.11'
     - uses: abatilo/actions-poetry@v4
     - name: install
       run: poetry install -E docs
