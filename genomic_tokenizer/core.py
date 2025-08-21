@@ -1,18 +1,61 @@
 """
-Inspired by: https://github.com/HazyResearch/hyena-dna/blob/main/src/dataloaders/datasets/hg38_char_tokenizer.py
-and
-CharacterTokenzier: https://github.com/dariush-bahrami/character-tokenizer
+Copyright 2025 Bell Eapen
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
+
+"""Genomic tokenizer core utilities.
+
+This module defines the :class:`GenomicTokenizer`, a lightweight
+Hugging Face compatible tokenizer that operates on DNA codons (triplets)
+and collapses synonymous codons to shared token ids. It optionally
+includes intronic regions (segments between stop and subsequent start
+codons) as ``[UNK]`` tokens so models can attend to gene structure while
+masking loss as needed downstream.
 """
 
 import json
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
-from transformers.tokenization_utils import AddedToken, PreTrainedTokenizer
+from transformers.tokenization_utils import PreTrainedTokenizer
+
+try:  # transformers >=4.40
+    from transformers.tokenization_utils import AddedToken  # type: ignore
+except ImportError:  # fallback
+    from transformers import AddedToken  # type: ignore
 
 
 class GenomicTokenizer(PreTrainedTokenizer):
+    """Tokenizer for genomic (DNA) sequences at codon granularity.
+
+    The vocabulary contains fixed special tokens plus groups of synonymous
+    codons mapped to the same integer id (reflecting the amino acid or
+    functional category: start / stop).
+
+    Args:
+        model_max_length (int): Maximum allowable sequence length (used
+            by downstream padding/truncation logic in HF pipelines).
+        padding_side (str, optional): Padding side; ``"left"`` or
+            ``"right"``. Defaults to ``"left"``.
+        introns (bool, optional): If True (default) codons appearing
+            after a stop codon and before the next start codon are
+            emitted as ``[UNK]``. If False they are skipped entirely.
+        **kwargs: Additional keyword arguments passed to
+            :class:`transformers.PreTrainedTokenizer`.
+    """
+
     # Define start codons and stop codons
     start_codon = ["ATG"]
     stop_codons = ["TAA", "TAG", "TGA"]
@@ -119,20 +162,19 @@ class GenomicTokenizer(PreTrainedTokenizer):
         model_max_length: int,
         padding_side: str = "left",
         introns: bool = True,  # Whether to include introns in the tokenized output
-        **kwargs
+        **kwargs,
     ):
-        """Character tokenizer for Hugging Face transformers.
-        [UNK] token is used for anything that are not in the codons.
+        """Initialize tokenizer and build codon vocabulary.
+
+        Populates the internal mapping from codon strings to integer ids
+        (sharing ids among synonymous codons) and registers special
+        tokens with Hugging Face infrastructure.
+
         Args:
-                    "[CLS]": 0
-                    "[SEP]": 1
-                    "[BOS]": 2
-                    "[MASK]": 3
-                    "[PAD]": 4
-                    "[RESERVED]": 5
-                    "[UNK]": 6
-                an id (starting at 7) will be assigned to each codon.
-            model_max_length (int): Model maximum sequence length.
+            model_max_length (int): Maximum sequence length expected.
+            padding_side (str, optional): Side to apply padding on.
+            introns (bool, optional): Retain intronic regions as ``[UNK]``.
+            **kwargs: Extra keyword args forwarded to parent class.
         """
         self.model_max_length = model_max_length
         self.introns = introns
@@ -169,16 +211,31 @@ class GenomicTokenizer(PreTrainedTokenizer):
 
     @property
     def vocab_size(self) -> int:
-        return len(self._vocab_str_to_int)
-
-    def _tokenize(self, text: str) -> List[str]:
-        """Tokenizes a gene sequence in FASTA format.
-
-        Args:
-            text (str): The gene sequence in FASTA format.
+        """Return size of vocabulary (special + codon tokens).
 
         Returns:
-            List[str]: A list of codons (tokens) starting from the first occurrence of a start codon in the text.
+            int: Number of distinct string tokens recognized.
+        """
+        return len(self._vocab_str_to_int)
+
+    def _tokenize(self, text: str) -> List[str]:  # type: ignore[override]
+        """Convert raw DNA text (optionally FASTA) into codon tokens.
+
+        Processing steps:
+            1. Drop FASTA header line (starting with ">") if present.
+            2. Uppercase and strip newlines.
+            3. Find first start codon; begin at that index if found.
+            4. Segment sequence into non-overlapping triplets.
+            5. Append codons while in an active (post-start, pre-stop) region.
+            6. After a stop codon, either append ``[UNK]`` (if ``introns``)
+               or skip codons until next start codon.
+            7. Trim trailing ``[UNK]`` tokens (these will be padded later).
+
+        Args:
+            text (str): Raw DNA sequence or FASTA formatted string.
+
+        Returns:
+            list[str]: Ordered list of codon and special token strings.
         """
         # replace fasta header (line starting with >) if it exists
         if text.startswith(">"):
@@ -225,23 +282,50 @@ class GenomicTokenizer(PreTrainedTokenizer):
         return encoded
 
     def _convert_token_to_id(self, token: str) -> int:
+        """Map a token string to its integer id.
+
+        Args:
+            token (str): Codon or special token string.
+
+        Returns:
+            int: Token id (``[UNK]`` id if not found).
+        """
         return self._vocab_str_to_int.get(token, self._vocab_str_to_int["[UNK]"])
 
     def _convert_id_to_token(self, index: int) -> str:
+        """Map an integer id back to its token string.
+
+        Args:
+            index (int): Token id.
+
+        Returns:
+            str: Token string.
+        """
         return self._vocab_int_to_str[index]
 
     def convert_tokens_to_string(self, tokens):
+        """Concatenate token list into a single string.
+
+        Note: This is a naive join and does not reverse codon merging or
+        restore original FASTA formatting.
+
+        Args:
+            tokens (list[str]): Token sequence to concatenate.
+
+        Returns:
+            str: Concatenated string.
+        """
         return "".join(tokens)
 
     def find_any_substring(self, string, substring_list):
-        """Finds any substring from the list in the given string.
+        """Return index of first occurrence of any candidate substring.
 
         Args:
-            string: The string to search in.
-            substring_list: A list of substrings to search for.
+            string (str): Text to search.
+            substring_list (list[str]): Substrings to test.
 
         Returns:
-            The first substring found, or None if no substring is found.
+            int: Start index of first match; -1 if none found.
         """
 
         for substring in substring_list:
@@ -249,15 +333,20 @@ class GenomicTokenizer(PreTrainedTokenizer):
                 return string.find(substring)
         return -1
 
-    def build_inputs_with_special_tokens(
-        self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None
-    ) -> List[int]:
-        sep = [self.sep_token_id]
-        # cls = [self.cls_token_id]
-        result = token_ids_0 + sep
-        if token_ids_1 is not None:
-            result += token_ids_1 + sep
-        return result
+    def build_inputs_with_special_tokens(self, token_ids_0, token_ids_1=None):  # type: ignore[override]
+        """Combine one or two sequences and append ``[SEP]`` token(s).
+
+        Args:
+            token_ids_0 (List[int]): First sequence ids.
+            token_ids_1 (List[int] | None): Second sequence ids.
+
+        Returns:
+            List[int]: Concatenated ids with trailing/intermediate ``[SEP]``.
+        """
+        sep_id = self.sep_token_id
+        if token_ids_1 is None:
+            return list(token_ids_0) + [sep_id]
+        return list(token_ids_0) + [sep_id] + list(token_ids_1) + [sep_id]
 
     def get_special_tokens_mask(
         self,
@@ -265,6 +354,17 @@ class GenomicTokenizer(PreTrainedTokenizer):
         token_ids_1: Optional[List[int]] = None,
         already_has_special_tokens: bool = False,
     ) -> List[int]:
+        """Create mask marking special tokens with 1.
+
+        Args:
+            token_ids_0 (list[int]): First sequence token ids.
+            token_ids_1 (list[int], optional): Second sequence token ids.
+            already_has_special_tokens (bool): If True, defer to parent
+                implementation assuming special tokens already present.
+
+        Returns:
+            list[int]: Parallel mask of 0/1 values.
+        """
         if already_has_special_tokens:
             return super().get_special_tokens_mask(
                 token_ids_0=token_ids_0,
@@ -279,7 +379,19 @@ class GenomicTokenizer(PreTrainedTokenizer):
 
     def create_token_type_ids_from_sequences(
         self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None
-    ) -> List[int]:
+    ) -> List[int]:  # type: ignore[override]
+        """Return token type (segment) ids aligned to input sequences.
+
+        The first (or only) segment receives id 0; the second (if any)
+        receives id 1.
+
+        Args:
+            token_ids_0 (list[int]): First sequence token ids.
+            token_ids_1 (list[int], optional): Second sequence token ids.
+
+        Returns:
+            list[int]: Segment id list.
+        """
         sep = [self.sep_token_id]
         # cls = [self.cls_token_id]
 
@@ -290,6 +402,11 @@ class GenomicTokenizer(PreTrainedTokenizer):
         return result
 
     def get_config(self) -> Dict:
+        """Return a serializable configuration dictionary.
+
+        Returns:
+            dict: Minimal config for saving/loading tokenizer.
+        """
         _config = {
             "tokenizer_class": self.__class__.__name__,
             "unk_token": self.unk_token,
@@ -305,44 +422,93 @@ class GenomicTokenizer(PreTrainedTokenizer):
         return _config
 
     def get_vocab(self) -> Dict[str, int]:
-        """
-        Returns the vocabulary as a dictionary of token to index.
-
-        `tokenizer.get_vocab()[token]` is equivalent to `tokenizer.convert_tokens_to_ids(token)` when `token` is in the
-        vocab.
+        """Return the string token to integer id mapping.
 
         Returns:
-            `Dict[str, int]`: The vocabulary.
+            dict[str, int]: Vocabulary dictionary.
         """
         return self._vocab_str_to_int
 
     @classmethod
     def from_config(cls, config: Dict) -> "GenomicTokenizer":
-        cfg = {}
-        cfg["characters"] = [chr(i) for i in config["char_ords"]]
-        cfg["model_max_length"] = config["model_max_length"]
-        return cls(**cfg)
+        """Instantiate tokenizer from config dictionary.
 
-    def save_pretrained(self, save_directory: Union[str, os.PathLike], **kwargs):
-        cfg_file = Path(save_directory) / "tokenizer_config.json"
+        Note: Expects keys produced by :meth:`get_config`. Currently only
+        `model_max_length` is restored; other dynamic codon changes must be
+        applied via setters after loading if desired.
+
+        Args:
+            config (dict): Configuration produced by :meth:`get_config`.
+
+        Returns:
+            GenomicTokenizer: New tokenizer instance.
+        """
+        model_max_length = config.get("model_max_length", 512)
+        return cls(model_max_length=model_max_length)
+
+    def save_pretrained(
+        self,
+        save_directory: Union[str, os.PathLike],
+        legacy_format: Optional[bool] = None,
+        filename_prefix: Optional[str] = None,
+        push_to_hub: bool = False,
+        **kwargs,
+    ) -> Tuple[str]:  # type: ignore[override]
+        """Persist tokenizer configuration to a directory.
+
+        Args:
+            save_directory (str | os.PathLike): Target directory path.
+            **kwargs: Unused extra save arguments for interface parity.
+        """
+        save_dir = Path(save_directory)
+        save_dir.mkdir(parents=True, exist_ok=True)
+        cfg_file = save_dir / "tokenizer_config.json"
         cfg = self.get_config()
-        with open(cfg_file, "w") as f:
+        with open(cfg_file, "w", encoding="utf-8") as f:
             json.dump(cfg, f, indent=4)
+        # Return tuple of saved file paths per HF convention
+        return (str(cfg_file),)
 
     @classmethod
-    def from_pretrained(cls, save_directory: Union[str, os.PathLike], **kwargs):
-        cfg_file = Path(save_directory) / "tokenizer_config.json"
-        with open(cfg_file) as f:
+    def from_pretrained(
+        cls,
+        pretrained_model_name_or_path: Union[str, os.PathLike],
+        *init_inputs,
+        **kwargs,
+    ) -> "GenomicTokenizer":  # type: ignore[override]
+        """Load tokenizer from directory or identifier.
+
+        Args:
+            pretrained_model_name_or_path (str | os.PathLike): Local path or
+                identifier containing ``tokenizer_config.json``.
+            *init_inputs: Unused, for HF API compatibility.
+            **kwargs: Ignored extra keyword args.
+
+        Returns:
+            GenomicTokenizer: Loaded tokenizer.
+        """
+        cfg_file = Path(pretrained_model_name_or_path) / "tokenizer_config.json"
+        with open(cfg_file, encoding="utf-8") as f:
             cfg = json.load(f)
         return cls.from_config(cfg)
 
     def set_start_codon(self, start_codons: List[str]):
+        """Set (override) list of start codon triplets.
+
+        Args:
+            start_codons (list[str]): New start codon sequences.
+        """
         self.start_codon = start_codons
         self.codons[2] = start_codons
         for codon in start_codons:
             self._vocab_str_to_int[codon] = 2
 
     def set_stop_codons(self, stop_codons: List[str]):
+        """Set (override) list of stop codon triplets.
+
+        Args:
+            stop_codons (list[str]): New stop codon sequences.
+        """
         self.stop_codons = stop_codons
         self.codons[1] = stop_codons
         for codon in stop_codons:
