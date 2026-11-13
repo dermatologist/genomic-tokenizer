@@ -209,14 +209,42 @@ class GenomicTokenizer(PreTrainedTokenizer):
 
         self._vocab_int_to_str = {v: k for k, v in self._vocab_str_to_int.items()}
 
-    @property
-    def vocab_size(self) -> int:
-        """Return size of vocabulary (special + codon tokens).
+        # Hugging Face compatibility: added tokens handling
+        self._added_tokens_encoder: Dict[str, int] = {}
+        self._added_tokens_decoder: Dict[int, AddedToken] = {}
+        special_token_names = ["[CLS]", "[SEP]", "[BOS]", "[MASK]", "[PAD]", "[RESERVED]", "[UNK]"]
+        for token, idx in self._vocab_str_to_int.items():
+            if token in special_token_names:
+                self._added_tokens_encoder[token] = idx
+                self._added_tokens_decoder[idx] = AddedToken(token)
+
+        # HF compatibility: vocab property (required by some HF utilities)
+        self.vocab = self._vocab_str_to_int.copy()
+
+    def save_vocabulary(
+        self,
+        save_directory: str,
+        filename_prefix: Optional[str] = None,
+    ) -> Tuple[str, ...]:
+        """Save vocabulary to a directory.
+
+        Args:
+            save_directory (str): Directory to save vocabulary.
+            filename_prefix (str, optional): Prefix for filenames.
 
         Returns:
-            int: Number of distinct string tokens recognized.
+            tuple[str]: Paths to saved files.
         """
-        return len(self._vocab_str_to_int)
+        save_dir = Path(save_directory)
+        save_dir.mkdir(parents=True, exist_ok=True)
+
+        prefix = filename_prefix or ""
+        vocab_file = save_dir / f"{prefix}vocab.json"
+
+        with open(vocab_file, "w", encoding="utf-8") as f:
+            json.dump(self.get_vocab(), f, indent=2, ensure_ascii=False)
+
+        return (str(vocab_file),)
 
     def _tokenize(self, text: str) -> List[str]:  # type: ignore[override]
         """Convert raw DNA text (optionally FASTA) into codon tokens.
@@ -427,7 +455,49 @@ class GenomicTokenizer(PreTrainedTokenizer):
         Returns:
             dict[str, int]: Vocabulary dictionary.
         """
-        return self._vocab_str_to_int
+        return self._vocab_str_to_int.copy()
+
+    @property
+    def vocab_size(self) -> int:
+        """Return size of vocabulary (special + codon tokens).
+
+        Returns:
+            int: Number of distinct string tokens recognized.
+        """
+        return len(self._vocab_str_to_int)
+
+    def _decode(
+        self,
+        token_ids: Union[int, List[int]],
+        skip_special_tokens: bool = False,
+        clean_up_tokenization_spaces: bool = True,
+        **kwargs,
+    ) -> str:
+        """Convert token ids back to text.
+
+        Args:
+            token_ids (int | list[int]): Token id(s) to decode.
+            skip_special_tokens (bool): If True, skip special tokens.
+            clean_up_tokenization_spaces (bool): Clean up spaces.
+            **kwargs: Additional kwargs for compatibility.
+
+        Returns:
+            str: Decoded text.
+        """
+        if isinstance(token_ids, int):
+            token_ids = [token_ids]
+
+        tokens = []
+        for token_id in token_ids:
+            if skip_special_tokens and token_id in self._added_tokens_decoder:
+                continue
+            token = self._convert_id_to_token(token_id)
+            tokens.append(token)
+
+        text = self.convert_tokens_to_string(tokens)
+        if clean_up_tokenization_spaces:
+            text = text.replace(" ", "")
+        return text
 
     @classmethod
     def from_config(cls, config: Dict) -> "GenomicTokenizer":
@@ -513,3 +583,17 @@ class GenomicTokenizer(PreTrainedTokenizer):
         self.codons[1] = stop_codons
         for codon in stop_codons:
             self._vocab_str_to_int[codon] = 1
+
+    def __getstate__(self) -> Dict:
+        """Support pickling by returning tokenizer state."""
+        state = self.__dict__.copy()
+        return state
+
+    def __setstate__(self, state: Dict):
+        """Restore tokenizer from pickled state."""
+        self.__dict__.update(state)
+
+    @property
+    def is_fast(self) -> bool:
+        """Indicate this is a slow (Python) tokenizer."""
+        return False
