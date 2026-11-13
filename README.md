@@ -1,10 +1,20 @@
 # :chains: Genomic Tokenizer
 
+[![PyPI download total](https://img.shields.io/pypi/dm/genomic-tokenizer.svg)](https://pypi.python.org/pypi/genomic-tokenizer/)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/dermatologist/genomic-tokenizer)
+
 ## About
-This is a tokenizer for DNA :chains: that aligns with the central dogma of molecular biology. You can use this tokenizer for training genomic transformer models. [See the BERT and GPT2 models trained on human genome](https://github.com/dermatologist/codon-llm). This is not tested yet, but feel free to try it and [improve it](/CONTRIBUTING.md). Please [cite](#books-cite) / [contact me](https://nuchange.ca/contact) if you use it in your research.
+This is a tokenizer for DNA :chains: that aligns with the central dogma of molecular biology. The Genomic Tokenizer (GT) incorporates the biological process flow into a [**standard tokenizer interface** within the HuggingFace transformer package](https://huggingface.co/docs/transformers/en/main_classes/tokenizer). GT can be used to pre-train foundational transformer models on DNA sequences. [[Read the preprint](https://www.biorxiv.org/content/10.1101/2025.04.02.646836v1)]
+
+Please [cite](#books-cite) / [contact me](https://nuchange.ca/contact) if you use it in your research.
 
 ## 🚀 Installation
 
+```bash
+pip install genomic-tokenizer
+```
+
+### If you want to install the latest version from the repository, use the following command:
 ```bash
 pip install git+https://github.com/dermatologist/genomic-tokenizer.git
 ```
@@ -20,7 +30,7 @@ AGGCGTAGCCGCCCCTGGGGACGTCATTGGTGGCGGAAGCAATCGCCGGCAACCAGCTGTAAGCGAGGTA
 GGCTCACTCGGGCACGGAGGGTGCGGGTGAGAAAGGGAACGATTTGCTAGGAGTGTATGCGCCCGTGCTA
 """
 model_max_length = 2048
-tokenizer = GenomicTokenizer(model_max_length)
+tokenizer = GenomicTokenizer(model_max_length)  # Use this in your model training pipeline
 tokens = tokenizer(fasta)
 print(tokens)
 ```
@@ -33,31 +43,28 @@ print(tokens)
 ```
 
 ## 🔧 Tokenization algorithm
-* Identify the first occurence of the start codon `ATG`.
+* Identify the first occurrence of the start codon `ATG`.
 * Split the sequence into codons of length 3 starting from the start codon.
 * Convert synonymous codons to the same token.
 * Convert stop codons to `[SEP]` token.
 
-## 🧠 Inspired by
-
-* https://github.com/HazyResearch/hyena-dna/blob/main/src/dataloaders/datasets/hg38_char_tokenizer.py
-* https://github.com/dariush-bahrami/character-tokenizer/blob/master/charactertokenizer/core.py
-* And the *CanineTokenizer* in transformers package.
-* [Read this article ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11055402/) for details on more elaborate tokenization strategies.
 
 ## :books: Cite
 
 ```
-@misc{genomic-tokenizer,
-  author = {Bell Raj Eapen},
-  title = {Genomic Tokenizer},
-  year = {2024},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{
-    https://github.com/dermatologist/genomic-tokenizer
-    }},
+
+@misc{GT-Eapen2025,
+  title = {Genomic {{Tokenizer}}: {{Toward}} a Biology-Driven Tokenization in Transformer Models for {{DNA}} Sequences},
+  shorttitle = {Genomic {{Tokenizer}}},
+  author = {Eapen, Bell Raj},
+  year = {2025},
+  month = apr,
+  pages = {2025.04.02.646836},
+  publisher = {bioRxiv},
+  doi = {10.1101/2025.04.02.646836},
+  urldate = {2025-04-11},
 }
+
 ```
 
 ## Give us a star ⭐️
