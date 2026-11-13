@@ -8,6 +8,7 @@ on:
     branches:
       - master
       - develop
+      - main
 
 jobs:
   build:
@@ -16,24 +17,31 @@ jobs:
     timeout-minutes: 10
     strategy:
       max-parallel: 4
+      matrix:
+        python-version: ['3.13']
+
     steps:
-      - uses: actions/checkout@v5
-      - name: Install Python
-        uses: actions/setup-python@v5
-        # see details (matrix, python-version, python-version-file, etc.)
-        # https://github.com/actions/setup-python
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v4
-      - name: Setup a local virtual environment (if no poetry.toml file)
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
-      - uses: actions/cache@v4
-        name: Define a cache for the virtual environment based on the dependencies lock file
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
-      - name: Install the project dependencies
-        run: poetry install
-      - name: Run the automated tests (for example)
-        run: poetry run pytest -s -v
+    - uses: actions/checkout@v6
+
+    - name: Set up the environment
+      uses: ./.github/actions/setup-python-env
+
+    - name: Run tests
+      run: uv run pytest
+
+    - name: Upload results to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+  # check-docs:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out
+  #       uses: actions/checkout@v6
+
+  #     - name: Set up the environment
+  #       uses: ./.github/actions/setup-python-env
+
+  #     - name: Check if documentation can be built
+  #       run: uv run mkdocs build
