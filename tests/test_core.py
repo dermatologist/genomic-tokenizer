@@ -4,9 +4,9 @@ from genomic_tokenizer.core import GenomicTokenizer
 
 def test_vocab_size():
     tokenizer = GenomicTokenizer(model_max_length=512)
-    # expected_vocab_size = len(tokenizer.codons) + len(tokenizer._vocab_str_to_int) - len(tokenizer.codons) + 1  # Adjusting for the unique keys in codons and special tokens
-    # assert tokenizer.vocab_size == expected_vocab_size
-    assert tokenizer.vocab_size == 71
+    # vocab_size should return the count of unique token IDs (26 unique IDs: 0-25)
+    # Multiple codons map to the same ID (synonymous codons share IDs)
+    assert tokenizer.vocab_size == 26
 
 
 def test_input_ids():
@@ -135,7 +135,7 @@ def test_vocab_property():
     # Modifying vocab should not affect internal state (it's a copy)
     tokenizer.vocab['TEST_TOKEN'] = 999
     assert 'TEST_TOKEN' not in tokenizer._vocab_str_to_int
-    assert tokenizer.vocab_size == 71  # Unchanged
+    assert tokenizer.vocab_size == 26  # Unchanged
 
 
 def test_save_vocabulary():
@@ -167,7 +167,7 @@ def test_save_vocabulary():
         assert saved_vocab == tokenizer.get_vocab()
         
         # Verify internal state unchanged
-        assert tokenizer.vocab_size == 71
+        assert tokenizer.vocab_size == 26
 
 
 def test_decode_method():
