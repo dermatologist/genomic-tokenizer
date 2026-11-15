@@ -462,9 +462,9 @@ class GenomicTokenizer(PreTrainedTokenizer):
         """Return size of vocabulary (special + codon tokens).
 
         Returns:
-            int: Number of distinct string tokens recognized.
+            int: Number of unique token IDs in the vocabulary.
         """
-        return len(self._vocab_str_to_int)
+        return len(set(self._vocab_str_to_int.values()))
 
     def _decode(
         self,
